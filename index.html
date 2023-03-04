@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linear Regression Model</title>
+  <!-- Import TensorFlow.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.7.4/dist/tf.min.js"></script>
+  <!-- Import tfjs-vis for visualization-->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis@1.0.2/dist/tfjs-vis.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+  
+</head>
+<body>
+  <br>
+  <input type="button" class="button" value="Start training" onclick="startTraining();" /><br>
+  <input type="button" class="button" value="Stop training" onclick="stopTraining=true;" /><br>
+  <input type="button" class="button" value="Save model" onclick="saveModel();" /><br><br>
+  You can load your model if you have one previously trained to see the inference curve<br>
+  Json file<input type="file" class="button" id="upload-json"/><br>
+  Binary file<input type="file" class="button" id="upload-weights"/><br>
+  <input type="button" class="button" value="Load model" onclick="loadModel();" /><br><br>
+  <input type="button" class="button" value="See inference curve" onclick="seeInferenceCurve();" /><br>
+  <script src="script.js"></script>
+</body>
+</html>
