@@ -1,8 +1,15 @@
 var stopTraining;
 const visorInstance = tfvis.visor();
-if (!visorInstance.isOpen()) {
-  visorInstance.toggle();
+
+function openVisor() {
+  if (!visorInstance.isOpen()) {
+    visorInstance.toggle();
+  }
 }
+
+const optimizer = tf.train.adam();
+const lost_function = tf.losses.meanSquaredError;
+const metric = ['mse'];
 
 async function getData() {
   const housesDataRaw = await fetch("https://static.platzi.com/media/public/uploads/datos-entrenamiento_15cd99ce-3561-494e-8f56-9492d4e86438.json");
@@ -19,58 +26,84 @@ async function getData() {
 }
 
 async function seeInferenceCurve() {
-  var data = await getData();
-  var tensorData = await convertDataToTensors(data);
-  const {inputsMax, inputsMin, tagsMin, tagsMax} = tensorData;
+  try {
+    var data = await getData();
+    var tensorData = await convertDataToTensors(data);
+    const { inputsMax, inputsMin, tagsMin, tagsMax } = tensorData;
 
-  const [xs, preds] = tf.tidy(() => {
-    const xs = tf.linspace(0,1,100);
-    const preds = modelo.predict(xs.reshape([100,1]));
+    const [xs, preds] = tf.tidy(() => {
+      const xs = tf.linspace(0, 1, 100);
+      const preds = modelo.predict(xs.reshape([100, 1]));
 
-    const denormX = xs
-      .mul(inputsMax.sub(inputsMin))
-      .add(inputsMin);
+      const denormX = xs
+        .mul(inputsMax.sub(inputsMin))
+        .add(inputsMin);
 
-    const denormY = preds
-      .mul(tagsMax.sub(tagsMin))
-      .add(tagsMin);
-    
-    return [denormX.dataSync(), denormY.dataSync()];
-  });
+      const denormY = preds
+        .mul(tagsMax.sub(tagsMin))
+        .add(tagsMin);
 
-  const predictionPoints = Array.from(xs).map((val, i) => {
-    return {x: val, y: preds[i]}
-  });
+      return [denormX.dataSync(), denormY.dataSync()];
+    });
 
-  const originalPoints = data.map(d => ({
-    x: d.rooms, y: d.price,
-  }));
+    const predictionPoints = Array.from(xs).map((val, i) => {
+      return { x: val, y: preds[i] }
+    });
 
-  tfvis.render.scatterplot(
-    {name: 'Predictions vs Originals'},
-    {values: [originalPoints, predictionPoints], series: ['originals', 'predictions']},
-    {
-      xLabel: 'Rooms',
-      yLabel: 'Price',
-      height: 300
-    }
-  );
+    const originalPoints = data.map(d => ({
+      x: d.rooms, y: d.price,
+    }));
+
+    tfvis.render.scatterplot(
+      { name: 'Predictions vs Originals' },
+      { values: [originalPoints, predictionPoints], series: ['originals', 'predictions'] },
+      {
+        xLabel: 'Rooms',
+        yLabel: 'Price',
+        height: 300
+      }
+    );
+  } catch (error) {
+    showNotification("error", "Start training a new model or load one");
+  }
 }
+
+function showNotification(type, msg) {
+  var notification = document.getElementById("notification");
+  notification.innerHTML = msg;
+
+  notification.classList.remove('notification-success', 'notification-error');
+  if (type === 'success') {
+    notification.classList.add('notification-success');
+  } else if (type === 'error') {
+    notification.classList.add('notification-error');
+  }
+
+  notification.style.opacity = 1;
+  setTimeout(function () {
+    notification.style.opacity = 0;
+  }, 3000);
+}
+
 async function loadModel() {
   const uploadJSONInput = document.getElementById('upload-json');
   const uploadWeightsInput = document.getElementById('upload-weights');
-  modelo = await tf.loadLayersModel(tf.io.browserFiles([uploadJSONInput.files[0], uploadWeightsInput.files[0]]));
-  console.log("Model loaded");
+  if (uploadJSONInput.value && uploadWeightsInput.value) {
+    modelo = await tf.loadLayersModel(tf.io.browserFiles([uploadJSONInput.files[0], uploadWeightsInput.files[0]]));
+    showNotification("success", "Model loaded!");
+  } else {
+    showNotification("error", "Upload the files");
+  }
 }
 
-function visualizeData(data){
+function visualizeData(data) {
   const mappedValues = data.map(d => ({
     x: d.rooms,
     y: d.price
   }));
   tfvis.render.scatterplot(
-    {name: 'Rooms vs Price'},
-    {values: mappedValues},
+    { name: 'Rooms vs Price' },
+    { values: mappedValues },
     {
       xLabel: 'Rooms',
       yLabel: 'Price',
@@ -81,14 +114,10 @@ function visualizeData(data){
 
 function createModel() {
   const new_model = tf.sequential();
-  new_model.add(tf.layers.dense({inputShape: [1], units: 1, useBias: true}));
-  new_model.add(tf.layers.dense({units: 1, useBias: true}));
+  new_model.add(tf.layers.dense({ inputShape: [1], units: 1, useBias: true }));
+  new_model.add(tf.layers.dense({ units: 1, useBias: true }));
   return new_model;
 }
-
-const optimizer = tf.train.adam();
-const lost_function = tf.losses.meanSquaredError;
-const metric = ['mse'];
 
 async function trainModel(model, inputs, labels) {
   model.compile({
@@ -97,9 +126,9 @@ async function trainModel(model, inputs, labels) {
     metrics: metric
   })
 
-  const surface = {name: 'show.history live', tab: 'Training'};
+  const surface = { name: 'show.history live', tab: 'Training' };
   const batchSize = 28;
-  const epochs = 50;
+  const epochs = 100;
   const history = [];
 
   return await model.fit(inputs, labels, {
@@ -119,7 +148,11 @@ async function trainModel(model, inputs, labels) {
 }
 
 async function saveModel() {
-  const saveResult = await modelo.save('downloads://regresion-model');
+  try {
+    const saveResult = await modelo.save('downloads://regresion-model');
+  } catch (error) {
+    showNotification("error", "Click on 'Start training' to create a new model.");
+  }
 }
 
 async function showData() {
@@ -127,14 +160,14 @@ async function showData() {
   visualizeData(data);
 }
 
-function convertDataToTensors(data){
+function convertDataToTensors(data) {
   return tf.tidy(() => {
     tf.util.shuffle(data);
     const inputs = data.map(d => d.rooms);
     const tags = data.map(d => d.price);
     const tensorInputs = tf.tensor2d(inputs, [inputs.length, 1]);
     const tensorTags = tf.tensor2d(tags, [tags.length, 1]);
-    
+
     const inputsMax = tensorInputs.max();
     const inputsMin = tensorInputs.min();
     const tagsMax = tensorTags.max();
@@ -155,11 +188,11 @@ function convertDataToTensors(data){
   });
 }
 
-async function startTraining(){
+async function startTraining() {
   var data = await getData();
   modelo = createModel();
   const tensorData = convertDataToTensors(data);
-  const {inputs, tags} = tensorData;
+  const { inputs, tags } = tensorData;
   trainModel(modelo, inputs, tags);
 }
 

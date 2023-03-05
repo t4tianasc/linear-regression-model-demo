@@ -1,16 +1,65 @@
-.button {
-  background-color: #f4511e;
-  border: none;
-  color: white;
-  padding: 16px 32px;
-  text-align: center;
-  font-size: 16px;
-  margin: 4px 2px;
-  opacity: 0.6;
-  transition: 0.3s;
-  display: inline-block;
-  text-decoration: none;
-  cursor: pointer;
+body {
+  background-color: #F5F5F5;
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
-.button:hover {opacity: 1}
+h1 {
+  color: #262626;
+  font-size: 2em;
+  font-weight: 600;
+  margin: 20px;
+  text-align: left;
+}
+
+.button {
+  background-color: #cde7f3;
+  border: none;
+  border-radius: 4px;
+  color: #262626;
+  cursor: pointer;
+  font-size: 1.2em;
+  margin: 10px 20px;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  transition-duration: 0.2s;
+}
+
+.button:hover {
+  background-color: #aeccf3;
+  color: #262626;
+  transition-duration: 0.2s;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 20px;
+}
+
+#notification {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  transition: opacity 2s ease-in-out;
+  opacity: 0;
+  z-index: 9999;
+}
+
+.notification-success {
+  background-color: rgb(115, 211, 115);
+  color: white;
+}
+
+.notification-error {
+  background-color: rgb(255, 125, 125);
+  color: white;
+}

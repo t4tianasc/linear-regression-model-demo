@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,18 +11,45 @@
   <!-- Import tfjs-vis for visualization-->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis@1.0.2/dist/tfjs-vis.umd.min.js"></script>
   <link rel="stylesheet" href="style.css">
-  
+
 </head>
+
 <body>
-  <br>
-  <input type="button" class="button" value="Start training" onclick="startTraining();" /><br>
-  <input type="button" class="button" value="Stop training" onclick="stopTraining=true;" /><br>
-  <input type="button" class="button" value="Save model" onclick="saveModel();" /><br><br>
-  You can load your model if you have one previously trained to see the inference curve<br>
-  Json file<input type="file" class="button" id="upload-json"/><br>
-  Binary file<input type="file" class="button" id="upload-weights"/><br>
-  <input type="button" class="button" value="Load model" onclick="loadModel();" /><br><br>
-  <input type="button" class="button" value="See inference curve" onclick="seeInferenceCurve();" /><br>
+  <div class="container">
+    <div>
+      <h1>Linear regression model - Demo using Neural Networks</h1><br><br>
+    </div>
+    <hr color="#aeccf3" size="4" width="100%">
+    <div>
+      <input type="button" class="button" value="Open visor" onclick="openVisor();" /><br>
+    </div>
+    <hr color="#aeccf3" size="4" width="100%">
+    <div>
+      <br>
+      <input type="button" class="button" value="Start training" onclick="startTraining();" /><br>
+      <input type="button" class="button" value="Stop training" onclick="stopTraining=true;" /><br>
+      <input type="button" class="button" value="Save model" onclick="saveModel();" /><br><br>
+    </div>
+    <hr color="#aeccf3" size="4" width="100%">
+    <div>
+      <br>
+      <input type="button" class="button" value="See inference curve" onclick="seeInferenceCurve();" /><br>
+      <br>
+    </div>
+    <hr color="#aeccf3" size="4" width="100%">
+    <div>
+      <br>
+      You can load your model if you have one previously trained to see the inference curve. The model is composed of two files:<br><br>
+      Model architecture (json file):<input type="file" id="upload-json" />
+      Trained weights (BIN file):<input type="file" id="upload-weights" /><br>
+      <br>
+      <input type="button" class="button" value="Load model" onclick="loadModel();" /><br><br>
+    </div>
+  </div>
+  <div id="notification">
+    <p></p>
+  </div>
   <script src="script.js"></script>
 </body>
+
 </html>
