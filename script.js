@@ -66,8 +66,8 @@ async function seeInferenceCurve() {
       { name: 'Predictions vs Originals' },
       { values: [originalPoints, predictionPoints], series: ['originals', 'predictions'] },
       {
-        xLabel: 'Rooms',
-        yLabel: 'Price',
+        xLabel: dataXlabel,
+        yLabel: dataYlabel,
         height: 300,
         zoomToFit: true
       }
