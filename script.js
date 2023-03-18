@@ -1,5 +1,8 @@
 var stopTraining;
 const visorInstance = tfvis.visor();
+var dataXlabel;
+var dataYlabel;
+var data;
 
 function openVisor() {
   if (!visorInstance.isOpen()) {
@@ -12,22 +15,28 @@ const lost_function = tf.losses.meanSquaredError;
 const metric = ['mse'];
 
 async function getData() {
-  const housesDataRaw = await fetch("https://static.platzi.com/media/public/uploads/datos-entrenamiento_15cd99ce-3561-494e-8f56-9492d4e86438.json");
-  const housesData = await housesDataRaw.json();
+  try {
+    const UrlJsonData = document.getElementById('url-json-data').value;
+    dataXlabel = document.getElementById('data-x-variable').value;
+    dataYlabel = document.getElementById('data-y-variable').value;
+    const objectsDataRaw = await fetch(UrlJsonData);
+    const objectsData = await objectsDataRaw.json();
 
-  var cleanedData = housesData.map(house => ({
-    price: house.Precio,
-    rooms: house.NumeroDeCuartosPromedio
-  }))
-  cleanedData = cleanedData.filter(house => (
-    house.price != null && house.rooms != null
-  ))
-  return cleanedData;
+    var cleanedData = objectsData.map(object => ({
+      dataY: parseFloat(object[dataYlabel]),
+      dataX: parseFloat(object[dataXlabel])
+    }))
+    cleanedData = cleanedData.filter(object => (
+      object.dataY != null && object.dataX != null
+    ))
+    return cleanedData;
+  } catch (error) {
+    showNotification("error", "Make sure the input data from the URL is correct");
+  }
 }
 
 async function seeInferenceCurve() {
   try {
-    var data = await getData();
     var tensorData = await convertDataToTensors(data);
     const { inputsMax, inputsMin, tagsMin, tagsMax } = tensorData;
 
@@ -51,7 +60,7 @@ async function seeInferenceCurve() {
     });
 
     const originalPoints = data.map(d => ({
-      x: d.rooms, y: d.price,
+      x: d.dataX, y: d.dataY,
     }));
 
     tfvis.render.scatterplot(
@@ -60,7 +69,8 @@ async function seeInferenceCurve() {
       {
         xLabel: 'Rooms',
         yLabel: 'Price',
-        height: 300
+        height: 300,
+        zoomToFit: true
       }
     );
   } catch (error) {
@@ -98,16 +108,17 @@ async function loadModel() {
 
 function visualizeData(data) {
   const mappedValues = data.map(d => ({
-    x: d.rooms,
-    y: d.price
+    x: d.dataX,
+    y: d.dataY
   }));
   tfvis.render.scatterplot(
-    { name: 'Rooms vs Price' },
+    { name: dataXlabel + ' vs ' + dataYlabel },
     { values: mappedValues },
     {
-      xLabel: 'Rooms',
-      yLabel: 'Price',
-      height: 300
+      xLabel: dataXlabel,
+      yLabel: dataYlabel,
+      height: 300,
+      zoomToFit: true
     }
   );
 }
@@ -156,15 +167,15 @@ async function saveModel() {
 }
 
 async function showData() {
-  var data = await getData();
+  data = await getData();
   visualizeData(data);
 }
 
 function convertDataToTensors(data) {
   return tf.tidy(() => {
     tf.util.shuffle(data);
-    const inputs = data.map(d => d.rooms);
-    const tags = data.map(d => d.price);
+    const inputs = data.map(d => d.dataX);
+    const tags = data.map(d => d.dataY);
     const tensorInputs = tf.tensor2d(inputs, [inputs.length, 1]);
     const tensorTags = tf.tensor2d(tags, [tags.length, 1]);
 
@@ -194,5 +205,3 @@ async function startTraining() {
   const { inputs, tags } = tensorData;
   trainModel(modelo, inputs, tags);
 }
-
-showData();

@@ -21,28 +21,39 @@
     </div>
     <hr color="#aeccf3" size="4" width="100%">
     <div>
+      <input type="button" class="button" value="Open visor" onclick="openVisor();" />
       <input type="button" class="button" value="Open visor" onclick="openVisor();" /><br>
     </div>
     <hr color="#aeccf3" size="4" width="100%">
     <div>
-      <br>
-      <input type="button" class="button" value="Start training" onclick="startTraining();" /><br>
-      <input type="button" class="button" value="Stop training" onclick="stopTraining=true;" /><br>
-      <input type="button" class="button" value="Save model" onclick="saveModel();" /><br><br>
+      <div class="user-input">
+        URL json data:
+        <input type="text" id="url-json-data"
+          value="https://static.platzi.com/media/public/uploads/datos-entrenamiento_15cd99ce-3561-494e-8f56-9492d4e86438.json" /><br>
+        X variable: <input type="text" id="data-x-variable" placeholder="e.g. number of rooms"
+          value="NumeroDeCuartosPromedio" />
+        Y variable: <input type="text" id="data-y-variable" placeholder="e.g. price of the house" value="Precio" />
+      </div>
+      <input type="button" class="button" value="Load and show data" onclick="showData();" /><br><br>
     </div>
     <hr color="#aeccf3" size="4" width="100%">
     <div>
-      <br>
+      <input type="button" class="button" value="Start training" onclick="startTraining();" />
+      <input type="button" class="button" value="Stop training" onclick="stopTraining=true;" />
+      <input type="button" class="button" value="Save model" onclick="saveModel();" /><br>
+    </div>
+    <hr color="#aeccf3" size="4" width="100%">
+    <div>
       <input type="button" class="button" value="See inference curve" onclick="seeInferenceCurve();" /><br>
-      <br>
     </div>
     <hr color="#aeccf3" size="4" width="100%">
     <div>
-      <br>
-      You can load your model if you have one previously trained to see the inference curve. The model is composed of two files:<br><br>
-      Model architecture (json file):<input type="file" id="upload-json" />
-      Trained weights (BIN file):<input type="file" id="upload-weights" /><br>
-      <br>
+      <div class="user-input">
+        You can load your model if you have one previously trained to see the inference curve. The model is composed of
+        two files:<br><br>
+        Model architecture (json file):<input type="file" id="upload-json" />
+        Trained weights (BIN file):<input type="file" id="upload-weights" /><br>
+      </div>
       <input type="button" class="button" value="Load model" onclick="loadModel();" /><br><br>
     </div>
   </div>
