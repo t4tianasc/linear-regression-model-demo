@@ -189,7 +189,6 @@ function convertDataToTensors(data) {
 }
 
 async function startTraining() {
-  var data = await getData();
   modelo = createModel();
   const tensorData = convertDataToTensors(data);
   const { inputs, tags } = tensorData;
