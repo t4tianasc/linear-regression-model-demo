@@ -1,18 +1,17 @@
-var stopTraining;
 const visorInstance = tfvis.visor();
+var stopTraining;
 var dataXlabel;
 var dataYlabel;
 var data;
+const optimizer = tf.train.adam();
+const lost_function = tf.losses.meanSquaredError;
+const metric = ['mse'];
 
 function openVisor() {
   if (!visorInstance.isOpen()) {
     visorInstance.toggle();
   }
 }
-
-const optimizer = tf.train.adam();
-const lost_function = tf.losses.meanSquaredError;
-const metric = ['mse'];
 
 async function getData() {
   try {
